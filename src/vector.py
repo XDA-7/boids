@@ -30,11 +30,19 @@ class Vector:
 
     def rotate(self, rotation: float) -> 'Vector':
         """Rotate the vector counter-clockwise by the rotation specified in radians"""
-        #x'=x * cos(theta) - y * sin(theta)
-        #y'=x * sin(theta) + y * cos(theta)
         x_val = self.x_val * cos(rotation) - self.y_val * sin(rotation)
         y_val = self.x_val * sin(rotation) + self.y_val * cos(rotation)
         return Vector(x_val, y_val)
+
+    def rotation(self) -> float:
+        """Calculates the cosine of the angle of the vector from (0, 1)"""
+        #Method: Simplification of the dot product where vector b = (0, 1) becomes
+        return self.y_val / self.magnitude()
+
+    def rotation_normalized(self) -> float:
+        """Calculates the cosine as above and then normalises it from (1, -1) to (0, 1)"""
+        cos_val = self.rotation()
+        return (-cos_val + 1) / 2
 
     def str(self) -> str:
         return '(' + str(self.x_val) + ', ' + str(self.y_val) + ')'

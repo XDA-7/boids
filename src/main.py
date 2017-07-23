@@ -10,11 +10,14 @@ ITERATIONS = 0
 window = window.Window()
 flock: FLOCK = [
     boid.Boid(5, 100, 500, 500, 0),
-    boid.Boid(5, 100, 550, 500, 1.5),
-    boid.Boid(5, 100, 480, 500, -1.5),
-    boid.Boid(5, 100, 500, 520, 3.14),
-    boid.Boid(5, 100, 500, 430, 3.14)
+    boid.Boid(5, 100, 550, 500, 0)
+    #boid.Boid(5, 100, 550, 500, 1.5),
+    #boid.Boid(5, 100, 480, 500, -1.5),
+    #boid.Boid(5, 100, 500, 520, 3.14),
+    #boid.Boid(5, 100, 500, 430, 3.14)
 ]
+
+#flock[0].torque = 1.5
 
 for boid in flock:
     window.add_boid(boid)

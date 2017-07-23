@@ -1,4 +1,12 @@
 from vector import Vector
 
-vector = Vector(2, 1)
-print(vector.rotate(1.57).str())
+vector = Vector(0, -1)
+print(vector.rotation_normalized())
+vector = Vector(0, 1)
+print(vector.rotation_normalized())
+vector = Vector(1, 0)
+print(vector.rotation_normalized())
+vector = Vector(-1, 0)
+print(vector.rotation_normalized())
+vector = Vector(4, 1)
+print(vector.rotation_normalized())
