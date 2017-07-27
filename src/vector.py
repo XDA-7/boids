@@ -35,8 +35,11 @@ class Vector:
         return Vector(x_val, y_val)
 
     def rotation(self) -> float:
-        """Calculates the cosine of the angle of the vector from (0, 1)"""
+        """Calculates the cosine of the angle of the vector from (0, 1),
+        a vector of (0, 0) will return 0"""
         #Method: Simplification of the dot product where vector b = (0, 1) becomes
+        if self.x_val == 0 and self.y_val == 0:
+            return 0
         return self.y_val / self.magnitude()
 
     def rotation_normalized(self) -> float:

@@ -46,7 +46,6 @@ class Boid:
     def update(self, boids: List['Boid']):
         """Adjusts the boid's velocity depending on neighbouring boids"""
         local_boids = self.find_neighbouring_boids(boids)
-        print('local boids count: ' + str(local_boids.__len__()))
         direction = Vector(0, -1).rotate(self.rotation)
         self.x_velocity = direction.x_val * SPEED
         self.y_velocity = direction.y_val * SPEED
@@ -54,15 +53,13 @@ class Boid:
             self.torque = 0
             return
         separation = self.separation_velocity(local_boids).rotate(-self.rotation)
-        print('separation velocity: ' + separation.str())
-        if separation.x_val < 0:
-            self.torque = -separation.rotation_normalized()
+        alignment = self.alignment_velocity(local_boids).rotate(-self.rotation)
+        cohesion = self.cohesion_velocity(local_boids).rotate(-self.rotation)
+        total_rotation = (separation + alignment + cohesion).normalized()
+        if total_rotation.x_val < 0:
+            self.torque = -total_rotation.rotation_normalized()
         else:
-            self.torque = separation.rotation_normalized()
-        print('torque: ' + str(self.torque))
-
-        # alignment = self.alignment_velocity(local_boids) * Boid.alignment_velocity_multiplier
-        # cohesion = self.cohesion_velocity(local_boids) * Boid.cohesion_velocity_multiplier
+            self.torque = total_rotation.rotation_normalized()
 
     def velocity(self) -> Vector:
         return Vector(self.x_velocity, self.y_velocity)
@@ -78,12 +75,12 @@ class Boid:
 
     def alignment_velocity(self, local_boids: List['Boid']) -> Vector:
         """Calculates the average velocity of all local boids"""
-        alignment_x = 0
-        alignment_y = 0
+        local_velocity_x = 0
+        local_velocity_y = 0
         for boid in local_boids:
-            alignment_x += boid.x_velocity
-            alignment_y += boid.y_velocity
-        return Vector(alignment_x, alignment_y).normalized()
+            local_velocity_x += boid.x_velocity
+            local_velocity_y += boid.y_velocity
+        return Vector(local_velocity_x, local_velocity_y).normalized()
 
     def cohesion_velocity(self, local_boids: List['Boid']) -> Vector:
         """Calculates the direction towards the center of mass of all local boids"""
