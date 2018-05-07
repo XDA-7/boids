@@ -4,6 +4,7 @@ import time
 import tkinter
 from typing import Tuple
 from boid import Boid
+from vector import Vector
 
 HEIGHT = 1000
 WIDTH = 1000
@@ -32,13 +33,13 @@ class Window:
         self.last_time = time.monotonic()
         self.window.update()
 
-    def unconstrained_velocity(self, delta_time: float, boid: Boid) -> Tuple[float,float]:
+    def unconstrained_velocity(self, delta_time: float, boid: Boid) -> Tuple[float, float]:
         """Returns the x and y movements as they are"""
         delta_x = boid.x_velocity * delta_time
         delta_y = boid.y_velocity * delta_time
         return (delta_x, delta_y)
-    
-    def constrained_velocity(self, delta_time: float, boid: Boid) -> Tuple[float,float]:
+
+    def constrained_velocity(self, delta_time: float, boid: Boid) -> Tuple[float, float]:
         """Returns the x and y movements constrained as though the window edges were a wall"""
         delta_x = boid.x_velocity * delta_time
         delta_y = boid.y_velocity * delta_time
@@ -47,9 +48,9 @@ class Window:
         else:
             return (delta_x, delta_y)
 
-    def bounced_velocity(self, delta_time: float, boid: Boid) -> Tuple[float,float]:
-        """Returns the x and y movements, if these would take the boid outside of the window boundary
-        then (0, 0) is returned and the boid is rotated 180 degrees"""
+    def bounced_velocity(self, delta_time: float, boid: Boid) -> Tuple[float, float]:
+        """Returns the x and y movements, if these would take the boid outside of the window
+        boundary then (0, 0) is returned and the boid is rotated 180 degrees"""
         delta_x = boid.x_velocity * delta_time
         delta_y = boid.y_velocity * delta_time
         if self.on_border(boid, delta_x, delta_y):
@@ -57,11 +58,40 @@ class Window:
             return (0, 0)
         else:
             return (delta_x, delta_y)
-    
+
+    def reflected_velocity(self, delta_time: float, boid: Boid) -> Tuple[float, float]:
+        """Returns the x and y movements, if these would take the boid outside of the window
+        boundary then (0, 0) is returned and the velocity is reflected"""
+        x_velocity = boid.x_velocity
+        y_velocity = boid.y_velocity
+        delta_x = x_velocity * delta_time
+        delta_y = y_velocity * delta_time
+        if self.on_border(boid, delta_x, delta_y):
+            if self.on_vertical_border(boid, delta_y):
+                x_velocity = -x_velocity
+            if self.on_horizontal_border(boid, delta_x):
+                y_velocity = -y_velocity
+            rotation = Vector(x_velocity, y_velocity).rotation_normalized() * 3.14
+            if x_velocity < 0:
+                boid.rotation = rotation
+            else:
+                boid.rotation = -rotation
+            return (0, 0)
+        else:
+            return (delta_x, delta_y)
+
     def on_border(self, boid: Boid, delta_x: float, delta_y: float) -> bool:
         """Return true if the movement would take the boid outside of the boundary of the window"""
-        return (delta_x > 0 and boid.x_position >= WIDTH or delta_x < 0 and boid.x_position < 0 or
+        return (delta_x > 0 and boid.x_position >= WIDTH or delta_x < 0 and boid.x_position < 0 or  
                 delta_y > 0 and boid.y_position >= HEIGHT or delta_y < 0 and boid.y_position < 0)
+
+    def on_vertical_border(self, boid: Boid, delta_y: float) -> bool:
+        """Return true if the movement would take the boid out of the top or bottom border"""
+        return delta_y > 0 and boid.y_position >= HEIGHT or delta_y < 0 and boid.y_position < 0
+
+    def on_horizontal_border(self, boid: Boid, delta_x: float) -> bool:
+        """Return true if the movement would take the boid out of the left or right border"""
+        return delta_x > 0 and boid.x_position >= WIDTH or delta_x < 0 and boid.x_position < 0
 
     def add_boid(self, boid: Boid):
         """Add a boid to the canvas"""
